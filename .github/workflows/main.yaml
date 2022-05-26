@@ -59,6 +59,8 @@ jobs:
     needs: [lint-check]
     runs-on: ubuntu-latest
     steps:
+      - run: |
+          mkdir -p ${{ github.workspace }}/artifact
       - uses: actions/checkout@v2
       - name: Set up Python 3.x
         uses: actions/setup-python@v2
@@ -96,13 +98,13 @@ jobs:
           # exit code when vulnerabilities were found
           exit-code: 1
           format: 'sarif'
-          output: 'trivy-results.sarif'
+          output: ${{ github.workspace }}/artifact/trivy-results.sarif
           # severities of vulnerabilities to be displayed
           severity: HIGH,CRITICAL
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: ${{ github.workspace }}/artifact/trivy-results.sarif
   check-point:
     needs: [docker-build-scan]
     runs-on: ubuntu-latest
